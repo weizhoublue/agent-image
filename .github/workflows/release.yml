@@ -109,6 +109,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Push release/<tag> branch
+        run: |
+          git checkout -b "release/${{ github.ref_name }}" "${{ github.ref_name }}"
+          git push origin "release/${{ github.ref_name }}" --force
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
