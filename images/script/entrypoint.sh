@@ -6,7 +6,7 @@ source /script/install-helpers.sh
 
 export NPM_CONFIG_PREFIX=/usr/local
 
-INIT_MARKER="/tmp/.entrypoint-initialized"
+INIT_MARKER="/_entrypoint-initialized"
 
 log "agent-claude entrypoint start"
 log_install_config
