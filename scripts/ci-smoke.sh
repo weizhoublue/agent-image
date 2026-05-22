@@ -5,7 +5,7 @@ set -euo pipefail
 IMAGE="${1:?usage: ci-smoke.sh <image:tag>}"
 TIMEOUT="${SMOKE_TIMEOUT:-900}"
 WORKDIR="$(mktemp -d)"
-trap 'rm -rf "${WORKDIR}"' EXIT
+trap 'rm -rf "${WORKDIR}" 2>/dev/null || sudo rm -rf "${WORKDIR}" 2>/dev/null || true' EXIT
 
 echo "=== Smoke test: ${IMAGE} ==="
 if [[ -n "${SMOKE_PLATFORM:-}" ]]; then
