@@ -6,8 +6,15 @@ source /script/install-helpers.sh
 
 export NPM_CONFIG_PREFIX=/usr/local
 
+INIT_MARKER="/_entrypoint-initialized"
+
 log "agent-claude entrypoint start"
 log_install_config
+
+if [[ -f "${INIT_MARKER}" ]]; then
+  log "Already initialized — skipping install (remove container to force reinstall)"
+  exec "$@"
+fi
 
 log "Core: claude-code"
 # shellcheck source=install/install-claude-code.sh
@@ -21,6 +28,8 @@ source /script/run-optional-installs.sh
 
 abort_if_install_failed
 
+
+touch "${INIT_MARKER}"
 
 log "Environment ready"
 
