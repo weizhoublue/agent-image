@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -15,7 +15,62 @@ env:
   PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
-  build-publish:
+  build-smoke:
+    name: Build and smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate multi-arch build (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: images
+          platforms: ${{ env.PLATFORMS }}
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:release-validate-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build linux/amd64 for smoke (load into daemon)
+        uses: docker/build-push-action@v6
+        with:
+          context: images
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: agent-image:release-smoke-amd64-${{ github.sha }}
+          cache-from: type=gha
+
+      - name: Smoke test (linux/amd64)
+        run: |
+          chmod +x scripts/ci-smoke.sh
+          SMOKE_TIMEOUT=900 ./scripts/ci-smoke.sh "agent-image:release-smoke-amd64-${{ github.sha }}"
+
+      - name: Build linux/arm64 for smoke (load into daemon)
+        uses: docker/build-push-action@v6
+        with:
+          context: images
+          platforms: linux/arm64
+          push: false
+          load: true
+          tags: agent-image:release-smoke-arm64-${{ github.sha }}
+          cache-from: type=gha
+
+      - name: Smoke test (linux/arm64)
+        run: |
+          chmod +x scripts/ci-smoke.sh
+          SMOKE_PLATFORM=linux/arm64 SMOKE_TIMEOUT=900 \
+            ./scripts/ci-smoke.sh "agent-image:release-smoke-arm64-${{ github.sha }}"
+
+  publish:
+    name: Push image to GHCR
+    needs: build-smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,15 +100,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Smoke test entrypoint (linux/amd64)
-        run: |
-          chmod +x scripts/ci-smoke.sh
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}"
-          docker pull --platform linux/amd64 "${IMAGE}"
-          SMOKE_PLATFORM=linux/amd64 SMOKE_TIMEOUT=900 ./scripts/ci-smoke.sh "${IMAGE}"
+  github-release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Smoke test entrypoint (linux/arm64)
-        run: |
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}"
-          docker pull --platform linux/arm64 "${IMAGE}"
-          SMOKE_PLATFORM=linux/arm64 SMOKE_TIMEOUT=900 ./scripts/ci-smoke.sh "${IMAGE}"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          make_latest: true

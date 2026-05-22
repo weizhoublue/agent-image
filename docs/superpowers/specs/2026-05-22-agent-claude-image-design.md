@@ -215,14 +215,13 @@ build:
 
 触发: `push` tags `v*`
 
-步骤:
+三个 job（顺序依赖，任一失败则后续不执行）:
 
-1. Checkout 对应 tag
-2. `docker buildx build --platform linux/amd64,linux/arm64 --push` → `ghcr.io/<owner>/<repo>:<tag>`（manifest list，同 tag 多架构；镜像名与仓库名一致）
-3. 冒烟: 分别 `docker pull --platform linux/amd64|arm64` 后运行 `scripts/ci-smoke.sh`（`SMOKE_PLATFORM`）
-4. 同时推送 `:latest`
+1. **build-smoke** — 校验双架构 Dockerfile 可构建；`load` 本地 `amd64` / `arm64` 镜像并各跑一次 `scripts/ci-smoke.sh`（**不 push**）
+2. **publish** — 登录 GHCR，`buildx --push` → `ghcr.io/<owner>/<repo>:<tag>` 与 `:latest`（manifest list）
+3. **github-release** — `softprops/action-gh-release` 为当前 tag 生成 Release Notes
 
-权限: `packages: write`；需 `setup-qemu-action` + `setup-buildx-action`。
+权限: `contents: write`（GitHub Release）、`packages: write`（GHCR）；需 `setup-qemu-action` + `setup-buildx-action`。
 
 ### 9.2 PR 检查
 

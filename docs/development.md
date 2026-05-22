@@ -82,7 +82,7 @@ SMOKE_PLATFORM=linux/arm64 ./scripts/ci-smoke.sh <image:tag>
 | Workflow | 触发 | 行为 |
 |----------|------|------|
 | [.github/workflows/pr.yml](../.github/workflows/pr.yml) | PR → `main` | buildx 构建 `amd64+arm64`（不 push）+ 加载 `amd64` 镜像冒烟 |
-| [.github/workflows/release.yml](../.github/workflows/release.yml) | tag `v*` | push 多架构 manifest 到 GHCR + `amd64`/`arm64` 各跑一次冒烟 |
+| [.github/workflows/release.yml](../.github/workflows/release.yml) | tag `v*` | ① build + `amd64`/`arm64` 冒烟 ② push GHCR ③ 创建 GitHub Release |
 
 镜像路径：`ghcr.io/<github.repository>:<tag>`，同时打 `latest`。
 
