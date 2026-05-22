@@ -1,0 +1,51 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build multi-arch (validate both platforms)
+        uses: docker/build-push-action@v6
+        with:
+          context: images
+          platforms: ${{ env.PLATFORMS }}
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build linux/amd64 for smoke (load into daemon)
+        uses: docker/build-push-action@v6
+        with:
+          context: images
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: agent-image:pr-smoke-${{ github.sha }}
+          cache-from: type=gha
+
+      - name: Smoke test entrypoint (linux/amd64)
+        run: |
+          chmod +x scripts/ci-smoke.sh
+          SMOKE_TIMEOUT=900 ./scripts/ci-smoke.sh "agent-image:pr-smoke-${{ github.sha }}"
