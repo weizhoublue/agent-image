@@ -6,8 +6,11 @@
     "permissions": {
       "defaultMode": "bypassPermissions",
       "additionalDirectories": [
-        "~/Documents/git",
-        "~/Documents/forkgit"
+        "/home/agent/Documents/git",
+        "/root/Documents/git",
+        "/home/agent/Documents/forkgit",
+        "/root/Documents/forkgit",
+        "/workspace"
       ]
     },
     "skipDangerousModePermissionPrompt": true,
