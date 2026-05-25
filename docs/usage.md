@@ -96,6 +96,7 @@ docker exec -it \
 | `ENABLE_MCP_EXA` | `false` | Exa MCP |
 | `ENABLE_MCP_CONTEXT7` | `false` | Context7 MCP（需 `CONTEXT7_API_KEY`） |
 | `ENABLE_MCP_GITHUB` | `false` | GitHub MCP（需 `GITHUB_API_KEY`） |
+| `ENABLE_MCP_CODEGRAPH` | `false` | CodeGraph MCP |
 | `ENABLE_PLUGIN_SUPERPOWER` | `false` | superpowers 插件 |
 | `ENABLE_RTK` | `false` | rtk CLI |
 | `ENABLE_QUERY_SESSION` | `false` | [query-session](https://github.com/weizhoublue/query-session) CLI（查 Claude/Codex/Cursor 会话） |
