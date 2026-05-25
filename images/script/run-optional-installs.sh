@@ -33,6 +33,13 @@ else
   log_skip "MCP github — ENABLE_MCP_GITHUB / ENABLE_ALL not set"
 fi
 
+if is_enabled ENABLE_MCP_CODEGRAPH; then
+  # shellcheck source=install/install-mcp-codegraph.sh
+  source /script/install/install-mcp-codegraph.sh || INSTALL_FAILURES=$((INSTALL_FAILURES + 1))
+else
+  log_skip "MCP codegraph — ENABLE_MCP_CODEGRAPH / ENABLE_ALL not set"
+fi
+
 if is_enabled ENABLE_PLUGIN_SUPERPOWER; then
   # shellcheck source=install/install-plugin-superpowers.sh
   source /script/install/install-plugin-superpowers.sh || INSTALL_FAILURES=$((INSTALL_FAILURES + 1))

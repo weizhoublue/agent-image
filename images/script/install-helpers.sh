@@ -52,6 +52,7 @@ log_install_config() {
   log_info "ENABLE_MCP_EXA=${ENABLE_MCP_EXA:-false}"
   log_info "ENABLE_MCP_CONTEXT7=${ENABLE_MCP_CONTEXT7:-false}"
   log_info "ENABLE_MCP_GITHUB=${ENABLE_MCP_GITHUB:-false}"
+  log_info "ENABLE_MCP_CODEGRAPH=${ENABLE_MCP_CODEGRAPH:-false}"
   log_info "ENABLE_PLUGIN_SUPERPOWER=${ENABLE_PLUGIN_SUPERPOWER:-false}"
   log_info "ENABLE_RTK=${ENABLE_RTK:-false}"
   log_info "ENABLE_QUERY_SESSION=${ENABLE_QUERY_SESSION:-false}"
