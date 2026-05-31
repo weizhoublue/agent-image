@@ -38,6 +38,10 @@ fi
 log "Installing agent-run wrapper"
 cat > /usr/local/bin/agent-run << 'EOF'
 #!/bin/bash
+# Fix .claude directory permissions in case it was created by root
+if [[ -d "/home/agent/.claude" ]]; then
+  chown -R 1000:1000 /home/agent/.claude 2>/dev/null || true
+fi
 exec gosu 1000 "$@"
 EOF
 chmod +x /usr/local/bin/agent-run
