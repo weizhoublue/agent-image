@@ -28,6 +28,12 @@ source /script/run-optional-installs.sh
 
 abort_if_install_failed
 
+# Fix .claude directory permissions (may be created during claude first run)
+if [[ -d "${AGENT_HOME}/.claude" ]]; then
+  chown -R "${AGENT_UID}:${AGENT_GID}" "${AGENT_HOME}/.claude" 2>/dev/null || true
+  log "Fixed .claude directory permissions"
+fi
+
 # Install agent-run wrapper (gosu shortcut for npm/npx/...)
 log "Installing agent-run wrapper"
 cat > /usr/local/bin/agent-run << 'EOF'
