@@ -28,6 +28,13 @@ source /script/run-optional-installs.sh
 
 abort_if_install_failed
 
+# Install agent-run wrapper (gosu shortcut for npm/npx/...)
+log "Installing agent-run wrapper"
+cat > /usr/local/bin/agent-run << 'EOF'
+#!/bin/bash
+exec gosu 1000 "$@"
+EOF
+chmod +x /usr/local/bin/agent-run
 
 touch "${INIT_MARKER}"
 
