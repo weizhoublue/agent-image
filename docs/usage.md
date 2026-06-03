@@ -39,6 +39,7 @@ docker run -d --name agent-claude \
   -v "${HOME}/.gitconfig:/home/agent/.gitconfig:ro" \
   -v "${HOME}/.config/gh:/home/agent/.config/gh:ro" \
   -v "${HOME}/.ssh:/home/agent/.ssh:ro" \
+  -v "${HOME}/.config/gh:/home/agent/.config/gh:ro" \
 	-e ENABLE_ALL=true \
   -e ANTHROPIC_BASE_URL="http://100.117.111.4:20128/v1" \
   ghcr.io/weizhoublue/agent-image:latest
