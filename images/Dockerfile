@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gosu \
     gh \
+    jq \
     libsecret-1-0 \
     sqlite3 \
     && apt-get clean \
